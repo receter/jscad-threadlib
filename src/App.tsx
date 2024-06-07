@@ -1,18 +1,17 @@
-import { useMemo, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import jscadLogo from './assets/jscad.png'
-import './App.css'
-import { JSCADViewer } from './components/JSCADViewer'
-import { randomCube } from '../lib/main'
+import { useMemo, useState } from "react";
+import reactLogo from "./assets/react.svg";
+import viteLogo from "./assets/vite.svg";
+import jscadLogo from "./assets/jscad.png";
+import "./App.css";
+import { JSCADViewer } from "./components/JSCADViewer";
+import { randomCube } from "../lib/main";
 
 function App() {
   const [length, setCount] = useState(10);
 
   const solids = useMemo(() => {
     return randomCube({ minSize: length, maxSize: length * 2 });
-  }
-    , [length]);
+  }, [length]);
 
   return (
     <>
@@ -44,7 +43,7 @@ function App() {
         Read the Vite Docs (Library Mode)
       </a>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
