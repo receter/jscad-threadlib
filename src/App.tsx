@@ -1,17 +1,41 @@
 import { useMemo, useState } from "react";
+import { JSCADViewer } from "./components/JSCADViewer";
+import { bolt, nut, thread, getThreadSpecsFromTable } from "../lib/main";
+import { THREAD_TABLE, ThreadDesignator } from "../lib/threadTable";
+
 import reactLogo from "./assets/react.svg";
 import viteLogo from "./assets/vite.svg";
 import jscadLogo from "./assets/jscad.png";
 import "./App.css";
-import { JSCADViewer } from "./components/JSCADViewer";
-import { randomCube } from "../lib/main";
 
 function App() {
-  const [length, setCount] = useState(10);
+  const [turns, setTurns] = useState(3);
+  const [threadDesignator, setThreadDesignator] =
+    useState<ThreadDesignator>("PCO-1810-ext");
+  const [functionName, setFunctionName] = useState<"thread" | "bolt" | "nut">(
+    "thread",
+  );
 
   const solids = useMemo(() => {
-    return randomCube({ minSize: length, maxSize: length * 2 });
-  }, [length]);
+    switch (functionName) {
+      case "thread":
+        return thread({
+          thread: threadDesignator,
+          turns: turns,
+        });
+      case "bolt":
+        return bolt({
+          thread: threadDesignator,
+          turns: turns,
+        });
+      case "nut":
+        return nut({
+          thread: threadDesignator,
+          turns: turns,
+          outerRadius: getThreadSpecsFromTable(threadDesignator)[2] / 2 + 3,
+        });
+    }
+  }, [turns, threadDesignator, functionName]);
 
   return (
     <>
@@ -29,8 +53,28 @@ function App() {
       <h1>Vite + React + JSCAD</h1>
       <JSCADViewer solids={solids} />
       <div className="card">
-        <button onClick={() => setCount((length) => length + 1)}>
-          length is {length}
+        <select
+          value={threadDesignator}
+          onChange={(e) =>
+            setThreadDesignator(e.target.value as ThreadDesignator)
+          }
+        >
+          {THREAD_TABLE.map(([threadName]) => (
+            <option key={threadName} value={threadName}>
+              {threadName}
+            </option>
+          ))}
+        </select>
+        <select
+          value={functionName}
+          onChange={(e) => setFunctionName(e.target.value as "thread" | "bolt")}
+        >
+          <option value="thread">thread()</option>
+          <option value="bolt">bolt()</option>
+          <option value="nut">nut()</option>
+        </select>
+        <button onClick={() => setTurns((length) => length + 1)}>
+          length is {turns}
         </button>
         <p>
           Edit <code>lib/main.ts</code> and save to test HMR

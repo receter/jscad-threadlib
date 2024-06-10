@@ -1,71 +1,83 @@
-# React + TypeScript + Vite + JSCAD
+# JSCAD threadlib
 
-This template provides a minimal setup to publish a JSCAD package and uses React to render a simple user interface to test the output of the JSCAD package.
+JSCAD threadlib allows you to create threads in JSCAD designs by picking a standard thread from the built in thread table or specify your own thread parameters. It is a port of the OpenSCAD thread library [threadlib](https://github.com/adrianschlatter/threadlib) to JSCAD.
 
-## Getting started
+## Installation
 
-Create a new github repository from this template (more info [here](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template)) and clone the repository to your local machine.
-
-Install dependencies
+Depending on how you use JSCAD, you need to either install `jscad-threadlib` using npm or `require` it in your JSCAD design. Then you can call the `thread` function with the desired thread parameters.
 
 ```bash
-npm install
+npm install jscad-threadlib
 ```
 
-Start the development server with `npm run dev`, you should see a cube in the preview window.
-
-Edit `lib/main.ts` and `src/App.tsx` file to create your JSCAD package and adapt the dev preview UI to get a preview of your JSCAD package output.
-
-## Building your package
-
-To build your package run `npm run build`. This will create a `dist` folder with the compiled package. Check the files in the `dist` folder to make sure everything is correct.
-
-## Publishing your package
-
-First be sure to update the `name` and `version` fields in `package.json` before publishing. It is also a good idea to modify this `README.md` explaining what your package does and how to use it.
-
-To publish your package to npm run `npm publish`. This will publish your package to npm and make it available for others to use.
-
-If you want to publish the package to the public you have to set `private: false` in `package.json` to allow publishing. The first time you publish a public package you also need to append `--access public` to the publish command.
-
-```bash
-npm publish --access public
+```typescript
+import { thread } from "jscad-threadlib";
 ```
 
-## Using your package on jscad.app
-
-If you have published your package you can use it on the [jscad.app](https://jscad.app) website like so:
+When using `jscad-threadlib` in [jscad.app](https:jscad.app), you can use `require`, no need to install anything. The package will be downloaded automatically from a CDN.
 
 ```javascript
-const { randomCube } = require("jscad-mylib");
-
-function main() {
-  randomCube({ minSize: 1, maxSize: 10 });
-}
-
-module.exports = { main };
+const { thread } = require("jscad-threadlib");
 ```
 
-**Note:** If you update your plugin and jscad.app does not pick up the new version, it may be necessary to request purging the jsDelivr cache. You can do this here: [jsdelivr.com/tools/purge](https://www.jsdelivr.com/tools/purge)
+## Usage
 
-## Expanding the ESLint configuration
+The `thread` function takes either a string with a designator for a standard thread or an array with thread parameters:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+**Using a standard thread:**
 
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: "latest",
-    sourceType: "module",
-    project: ["./tsconfig.json", "./tsconfig.node.json"],
-    tsconfigRootDir: __dirname,
-  },
-};
+```javascript
+const thread1 = thread({
+  thread: "PCO-1810-ext", // PET bottle thread
+  turns: 3,
+});
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+You can find a list of all supported standard threads in the [here](lib/threadTable.ts).
+
+> If you want to contribute a thread, please read the [contribution guidelines](https://github.com/adrianschlatter/threadlib/blob/develop/docs/CONTRIBUTING.md#you-intend-to-contribute-new-threads), open a pull request to the original [OpecnSCAD threadlib](https://github.com/adrianschlatter/threadlib) repository and let me know in an issue.
+
+**Specifying your own thread specification:**
+
+```javascript
+// Specifying thread parameters
+const myThreadSpecs = [
+  3.18, // Pitch (mm)
+  12.055, // Rotation Radius (mm)
+  24.51, // Support Diameter (mm)
+  [
+    [0, -1.13],
+    [0, 1.13],
+    [1.66, 0.5258],
+    [1.66, -0.5258],
+  ], // Section Profile (mm, Points[])
+];
+
+const thread2 = thread({
+  thread: myThreadSpecs,
+  turns: 3,
+  higbeeArc: 20,
+  segments: 120,
+});
+```
+
+### Bolt and Nut Example
+
+You can use the `bolt` and `nut` functions to create a bolt and a nut with matching threads. The `bolt` function takes the same parameters as the `thread` function. The `nut` function has an additional `outerRadius` parameter.
+
+> Currently you need to select the correct thread designator (suffix `-ext` for bolts and `-int` for nuts) manually.
+
+```javascript
+const myBolt = bolt({
+  thread: "PCO-1810-ext",
+  turns: turns,
+});
+
+const supportDiameter = getThreadSpecs(threadDesignator)[2];
+
+const myNut = nut({
+  thread: "PCO-1810-int",
+  turns: turns,
+  outerRadius: supportDiameter + 3,
+});
+```
