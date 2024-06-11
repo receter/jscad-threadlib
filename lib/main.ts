@@ -6,6 +6,7 @@ import { primitives, booleans } from "@jscad/modeling";
 import { ThreadDesignator, ThreadSpecs } from "./threadTable";
 import { getThreadSpecs, straightThread } from "./utils";
 
+export { THREAD_TABLE } from "./threadTable";
 export { getThreadSpecsFromTable } from "./utils";
 
 const { cylinder } = primitives;
