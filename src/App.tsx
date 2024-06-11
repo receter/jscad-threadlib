@@ -1,8 +1,13 @@
 import { useMemo, useState } from "react";
 import { JSCADViewer } from "./components/JSCADViewer";
-import { bolt, nut, thread, getThreadSpecsFromTable } from "../lib/main";
-import { THREAD_TABLE, ThreadDesignator } from "../lib/threadTable";
-
+import {
+  THREAD_TABLE,
+  bolt,
+  nut,
+  thread,
+  getThreadSpecsFromTable,
+} from "../lib/main";
+import { ThreadDesignator } from "../lib/threadTable";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "./assets/vite.svg";
 import jscadLogo from "./assets/jscad.png";
@@ -59,9 +64,9 @@ function App() {
             setThreadDesignator(e.target.value as ThreadDesignator)
           }
         >
-          {THREAD_TABLE.map(([threadName]) => (
-            <option key={threadName} value={threadName}>
-              {threadName}
+          {THREAD_TABLE.map(([threadDesignator]) => (
+            <option key={threadDesignator} value={threadDesignator}>
+              {threadDesignator}
             </option>
           ))}
         </select>
