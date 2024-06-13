@@ -1,4 +1,4 @@
-name: Release components package
+name: Publish package to NPM on release
 
 on:
   release:
